@@ -1,7 +1,7 @@
 # GTX
 
 ## Description
-This is GTX, a main memory graph system that manages and queries dynamic graphs. GTX supports concurrent read-write and read-only transactions with snapshot isolation. GTX supports graph analytics using its OpenMP-tailored read-only transactions and transaction adjacency list scan protocol. It has been evaluated against state-of-the-art transactional graphy systems using [GFE_Driver]. Currently we only show the anonymized version. 
+This is GTX, a main memory graph system that manages and queries dynamic graphs. GTX supports concurrent read-write and read-only ACID transactions with snapshot isolation. GTX supports graph analytics using its OpenMP-tailored read-only transactions and transaction adjacency list scan protocol. It has been evaluated against state-of-the-art transactional graphy systems using [GFE_Driver]. 
 ## Build
 ### Prerequisites 
 - We only tested it on Linux.
