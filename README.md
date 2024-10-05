@@ -68,6 +68,9 @@ This class is used by OpenMP worker thread to implement graph analytics.
 - bool checked_put_edge(vertex_t src, label_t label, vertex_t dst, std::string_view edge_data)
 - bool checked_delete_edge(vertex_t src, label_t label, vertex_t dst)
 
+#### DeleteTransaction
+- void delete_vertex()
+
 #### SimpleEdgeDeltaIterator
 - bool valid()
 - void close()

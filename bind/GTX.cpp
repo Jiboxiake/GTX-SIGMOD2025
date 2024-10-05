@@ -818,3 +818,13 @@ void TwoHopNeighborsHandler::compute(std::vector<uint64_t> &vertices) {
 std::unordered_map<uint64_t, std::vector<uint64_t>> *TwoHopNeighborsHandler::get_result() {
     return thns->get_result();
 }
+
+DeleteTransaction::DeleteTransaction(std::unique_ptr<GTX::DeleteTransaction> _txn):txn(std::move(_txn)) {} {
+
+}
+
+DeleteTransaction::~DeleteTransaction() = default;
+
+void DeleteTransaction::delete_vertex() {
+    txn->delete_vertex();
+}
