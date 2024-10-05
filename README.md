@@ -20,6 +20,7 @@ This is GTX, a main memory graph system that manages and queries dynamic graphs.
 - include library GTX in your project's CMakeLists.txt. 
 - copy bind/GTX.hpp into your project. 
 - include GTX.hpp to use GTX
+- optional: install and run [GTX Checkpoint Manager] (https://anonymous.4open.science/r/GTX_Checkpoint_Merger-608E/README.md) to merge fuzzy incremental checkpoints and truncate logs.
 ### API
 The full GTX APIs can be found in /bind/GTX.hpp.
 Here we list the core APIs to manage and query a dynamic graph using GTX
