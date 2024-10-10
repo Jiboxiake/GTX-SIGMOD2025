@@ -3652,7 +3652,8 @@ bool DeleteTransaction::put_delete_vertex_delta(VertexIndexEntry & vertex_entry)
         throw std::runtime_error("error, must delete an existing vertex");
     }
 }
-void DeleteTransaction::delete_vertex() {
+void DeleteTransaction::delete_vertex(vertex_t vid) {
+    to_delete_vid = vid;
     //locate the vertex;
     auto& vertex_index_entry = graph.get_vertex_index_entry(to_delete_vid);
     //cannot insert to invalid vertex entry

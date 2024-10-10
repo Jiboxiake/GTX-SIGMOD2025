@@ -825,6 +825,6 @@ DeleteTransaction::DeleteTransaction(std::unique_ptr<GTX::DeleteTransaction> _tx
 
 DeleteTransaction::~DeleteTransaction() = default;
 
-void DeleteTransaction::delete_vertex() {
-    txn->delete_vertex();
+void DeleteTransaction::delete_vertex(vertex_t vid) {
+    txn->delete_vertex(vid);
 }

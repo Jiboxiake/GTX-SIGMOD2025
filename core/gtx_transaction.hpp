@@ -793,7 +793,7 @@ namespace GTX{
                                                                                                                                                                                                                                                                                                                                                                            thread_local_recycled_vertices(input_thread_local_recycled_vertices){
             thread_id = get_threadID(local_txn_id);
         }
-        void delete_vertex();
+        void delete_vertex(vertex_t vid);
         bool delete_reverse_edge(vertex_t other_vid,std::unordered_map<vertex_t,commit_delta_pair>& to_commit_deltas);
         void eager_clean_reverse_edge_block(std::unordered_map<vertex_t,commit_delta_pair>& to_commit_deltas);
         bool put_delete_vertex_delta(VertexIndexEntry &vertex_entry);
