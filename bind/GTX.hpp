@@ -184,7 +184,7 @@ namespace gt {
     public:
         DeleteTransaction(std::unique_ptr<GTX::DeleteTransaction> _txn);
         ~DeleteTransaction();
-        void delete_vertex();
+        void delete_vertex(vertex_t vid);
     private:
         const std::unique_ptr<GTX::DeleteTransaction> txn;
     };

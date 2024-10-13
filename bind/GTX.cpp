@@ -941,7 +941,7 @@ std::unordered_map<uint64_t, std::vector<uint64_t>> *TwoHopNeighborsHandler::get
     return thns->get_result();
 }
 
-DeleteTransaction::DeleteTransaction(std::unique_ptr<GTX::DeleteTransaction> _txn):txn(std::move(_txn)) {} {
+DeleteTransaction::DeleteTransaction(std::unique_ptr<GTX::DeleteTransaction> _txn):txn(std::move(_txn)) {
 
 }
 
