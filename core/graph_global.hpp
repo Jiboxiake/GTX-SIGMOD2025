@@ -56,5 +56,6 @@ constexpr uint8_t index_lookup_order_threshold = 12;
 #define USING_SIMPLE_PREVIOUS_VERSION false
 #define ENABLE_VERTEX_DELETION true
 #define ENSURE_DURABILITY true
+#define DIRECTED_GRAPH true
 constexpr uint32_t prefetch_offset = 512;
 //#endif //BWGRAPH_V2_GRAPH_GLOBAL_HPP

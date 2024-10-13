@@ -477,15 +477,34 @@ void RWTransaction::put_edge(gt::vertex_t src, gt::label_t label, gt::vertex_t d
         txn->get_graph().local_thread_edge_write_time.local()+= duration.count();
 #endif
         if(result == GTX::Txn_Operation_Response::SUCCESS){
+            break;
+        }else if(result ==GTX::Txn_Operation_Response::FAIL){
+            throw RollbackExcept("write write conflict edge");
+        }
+    }
+#if DIRECTED_GRAPH
+    while(true){
+#if TRACK_EXECUTION_TIME
+        auto start = std::chrono::high_resolution_clock::now();
+#endif
+        auto result = txn->put_edge(dst,src,label,edge_data);
+#if TRACK_EXECUTION_TIME
+        auto stop = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+        txn->get_graph().local_thread_edge_write_time.local()+= duration.count();
+#endif
+        if(result == GTX::Txn_Operation_Response::SUCCESS){
             return;
         }else if(result ==GTX::Txn_Operation_Response::FAIL){
             throw RollbackExcept("write write conflict edge");
         }
     }
+#endif
 }
 
 bool
 RWTransaction::checked_put_edge(gt::vertex_t src, gt::label_t label, gt::vertex_t dst, std::string_view edge_data) {
+    bool return_result = true;
     while(true){
 #if TRACK_EXECUTION_TIME
         auto start = std::chrono::high_resolution_clock::now();
@@ -500,12 +519,15 @@ RWTransaction::checked_put_edge(gt::vertex_t src, gt::label_t label, gt::vertex_
 #if ENSURE_DURABILITY
             txn->record_wal(GTX::WALType::EDGE_UPDATE,src,edge_data,dst,label);
 #endif
-            return true;
+            //return true;
+            break;
         }else if(result == GTX::Txn_Operation_Response::SUCCESS_EXISTING_DELTA){
 #if ENSURE_DURABILITY
             txn->record_wal(GTX::WALType::EDGE_UPDATE,src,edge_data,dst,label);
 #endif
-            return false;
+            //return false;
+            return_result = false;
+            break;
         }
         else if(result ==GTX::Txn_Operation_Response::FAIL){
 #if TRACK_COMMIT_ABORT
@@ -517,9 +539,39 @@ RWTransaction::checked_put_edge(gt::vertex_t src, gt::label_t label, gt::vertex_
         txn->get_graph().register_loop();
 #endif
     }
+
+#if DIRECTED_GRAPH
+    while(true){
+#if TRACK_EXECUTION_TIME
+        auto start = std::chrono::high_resolution_clock::now();
+#endif
+        auto result = txn->checked_put_edge(dst,src,label,edge_data);
+#if TRACK_EXECUTION_TIME
+        auto stop = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+        txn->get_graph().local_thread_edge_write_time.local()+= duration.count();
+#endif
+        if(result ==  GTX::Txn_Operation_Response::SUCCESS_NEW_DELTA || result == GTX::Txn_Operation_Response::SUCCESS_EXISTING_DELTA){
+#if ENSURE_DURABILITY
+            txn->record_wal(GTX::WALType::EDGE_UPDATE,dst,edge_data,src,label);
+#endif
+            return return_result;
+        }
+        else if (result == GTX::Txn_Operation_Response::FAIL){
+#if TRACK_COMMIT_ABORT
+            txn->get_graph().register_abort();
+#endif
+            throw RollbackExcept("write write conflict edge");
+        }
+#if TRACK_COMMIT_ABORT
+        txn->get_graph().register_loop();
+#endif
+    }
+#endif
 }
 
  bool RWTransaction::checked_single_put_edge(vertex_t src, label_t label, vertex_t dst, std::string_view edge_data){
+     bool return_result = true;
     while(true){
 #if TRACK_EXECUTION_TIME
         auto start = std::chrono::high_resolution_clock::now();
@@ -534,12 +586,15 @@ RWTransaction::checked_put_edge(gt::vertex_t src, gt::label_t label, gt::vertex_
 #if ENSURE_DURABILITY
             txn->record_wal(GTX::WALType::EDGE_UPDATE,src,edge_data,dst,label);
 #endif
-            return true;
+            //return true;
+            break;
         }else if(result == GTX::Txn_Operation_Response::SUCCESS_EXISTING_DELTA){
 #if ENSURE_DURABILITY
             txn->record_wal(GTX::WALType::EDGE_UPDATE,src,edge_data,dst,label);
 #endif
-            return false;
+            //return false;
+            return_result = false;
+            break;
         }
         else if(result ==GTX::Txn_Operation_Response::FAIL){
 #if TRACK_COMMIT_ABORT
@@ -551,6 +606,36 @@ RWTransaction::checked_put_edge(gt::vertex_t src, gt::label_t label, gt::vertex_
         txn->get_graph().register_loop();
 #endif
     }
+
+#if DIRECTED_GRAPH
+    while(true){
+#if TRACK_EXECUTION_TIME
+        auto start = std::chrono::high_resolution_clock::now();
+#endif
+        auto result = txn->checked_single_put_edge(dst,src,label,edge_data);
+#if TRACK_EXECUTION_TIME
+        auto stop = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+        txn->get_graph().local_thread_edge_write_time.local()+= duration.count();
+#endif
+        if(result ==  GTX::Txn_Operation_Response::SUCCESS_NEW_DELTA || result == GTX::Txn_Operation_Response::SUCCESS_EXISTING_DELTA){
+#if ENSURE_DURABILITY
+            txn->record_wal(GTX::WALType::EDGE_UPDATE,dst,edge_data,src,label);
+#endif
+            return return_result;
+        }
+        else if (result == GTX::Txn_Operation_Response::FAIL){
+#if TRACK_COMMIT_ABORT
+            txn->get_graph().register_abort();
+#endif
+            throw RollbackExcept("write write conflict edge");
+        }
+#if TRACK_COMMIT_ABORT
+        txn->get_graph().register_loop();
+#endif
+    }
+#endif
+
  }
 void RWTransaction::delete_edge(gt::vertex_t src, gt::label_t label, gt::vertex_t dst) {
     while(true){
@@ -575,6 +660,7 @@ void RWTransaction::delete_edge(gt::vertex_t src, gt::label_t label, gt::vertex_
 }
 
 bool RWTransaction::checked_delete_edge(gt::vertex_t src, gt::label_t label, gt::vertex_t dst) {
+    bool return_result = true;
     while(true){
 #if TRACK_EXECUTION_TIME
         auto start = std::chrono::high_resolution_clock::now();
@@ -589,12 +675,15 @@ bool RWTransaction::checked_delete_edge(gt::vertex_t src, gt::label_t label, gt:
 #if ENSURE_DURABILITY
             txn->record_wal(GTX::WALType::EDGE_DELETE,src,std::string_view(),dst,label);
 #endif
-            return true;
+            //return true;
+            break;
         }else if(result == GTX::Txn_Operation_Response::SUCCESS_NEW_DELTA){
 #if ENSURE_DURABILITY
             //nothing was deleted, so no wal needed
 #endif
-            return false;
+            //return false;
+            return_result = false;
+            break;
         }
         else if(result ==GTX::Txn_Operation_Response::FAIL){
 #if TRACK_COMMIT_ABORT
@@ -603,6 +692,39 @@ bool RWTransaction::checked_delete_edge(gt::vertex_t src, gt::label_t label, gt:
             throw RollbackExcept("write write conflict edge");
         }
     }
+
+#if DIRECTED_GRAPH
+    while(true){
+#if TRACK_EXECUTION_TIME
+        auto start = std::chrono::high_resolution_clock::now();
+#endif
+        auto result = txn->checked_delete_edge(dst,src,label);
+#if TRACK_EXECUTION_TIME
+        auto stop = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+        txn->get_graph().local_thread_edge_write_time.local()+= duration.count();
+#endif
+        if(result == GTX::Txn_Operation_Response::SUCCESS_EXISTING_DELTA){
+#if ENSURE_DURABILITY
+            txn->record_wal(GTX::WALType::EDGE_DELETE,dst,std::string_view(),src,label);
+#endif
+            //return true;
+            return return_result;
+        }else if(result == GTX::Txn_Operation_Response::SUCCESS_NEW_DELTA){
+#if ENSURE_DURABILITY
+            //nothing was deleted, so no wal needed
+#endif
+            //return false;
+            return return_result;
+        }
+        else if(result ==GTX::Txn_Operation_Response::FAIL){
+#if TRACK_COMMIT_ABORT
+            txn->get_graph().register_abort();
+#endif
+            throw RollbackExcept("write write conflict edge");
+        }
+    }
+#endif
 }
 std::string_view RWTransaction::get_vertex(gt::vertex_t src) {
     return txn->get_vertex(src);
