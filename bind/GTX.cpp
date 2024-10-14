@@ -505,7 +505,8 @@ void RWTransaction::put_edge(gt::vertex_t src, gt::label_t label, gt::vertex_t d
 bool
 RWTransaction::checked_put_edge(gt::vertex_t src, gt::label_t label, gt::vertex_t dst, std::string_view edge_data) {
     bool return_result = true;
-    while(true){
+    bool continue_executing = true;
+    while(continue_executing){
 #if TRACK_EXECUTION_TIME
         auto start = std::chrono::high_resolution_clock::now();
 #endif
@@ -520,14 +521,15 @@ RWTransaction::checked_put_edge(gt::vertex_t src, gt::label_t label, gt::vertex_
             txn->record_wal(GTX::WALType::EDGE_UPDATE,src,edge_data,dst,label);
 #endif
             //return true;
-            break;
+            //break;
+            continue_executing= false;
         }else if(result == GTX::Txn_Operation_Response::SUCCESS_EXISTING_DELTA){
 #if ENSURE_DURABILITY
             txn->record_wal(GTX::WALType::EDGE_UPDATE,src,edge_data,dst,label);
 #endif
             //return false;
             return_result = false;
-            break;
+            continue_executing= false;
         }
         else if(result ==GTX::Txn_Operation_Response::FAIL){
 #if TRACK_COMMIT_ABORT
@@ -541,7 +543,8 @@ RWTransaction::checked_put_edge(gt::vertex_t src, gt::label_t label, gt::vertex_
     }
 
 #if DIRECTED_GRAPH
-    while(true){
+    continue_executing= true;
+    while(continue_executing){
 #if TRACK_EXECUTION_TIME
         auto start = std::chrono::high_resolution_clock::now();
 #endif
@@ -661,7 +664,8 @@ void RWTransaction::delete_edge(gt::vertex_t src, gt::label_t label, gt::vertex_
 
 bool RWTransaction::checked_delete_edge(gt::vertex_t src, gt::label_t label, gt::vertex_t dst) {
     bool return_result = true;
-    while(true){
+    bool continue_executing = true;
+    while(continue_executing){
 #if TRACK_EXECUTION_TIME
         auto start = std::chrono::high_resolution_clock::now();
 #endif
@@ -676,14 +680,16 @@ bool RWTransaction::checked_delete_edge(gt::vertex_t src, gt::label_t label, gt:
             txn->record_wal(GTX::WALType::EDGE_DELETE,src,std::string_view(),dst,label);
 #endif
             //return true;
-            break;
+            //break;
+            continue_executing = false;
         }else if(result == GTX::Txn_Operation_Response::SUCCESS_NEW_DELTA){
 #if ENSURE_DURABILITY
             //nothing was deleted, so no wal needed
 #endif
             //return false;
             return_result = false;
-            break;
+            continue_executing = false;
+            //break;
         }
         else if(result ==GTX::Txn_Operation_Response::FAIL){
 #if TRACK_COMMIT_ABORT
@@ -694,7 +700,8 @@ bool RWTransaction::checked_delete_edge(gt::vertex_t src, gt::label_t label, gt:
     }
 
 #if DIRECTED_GRAPH
-    while(true){
+    continue_executing = true;
+    while(continue_executing){
 #if TRACK_EXECUTION_TIME
         auto start = std::chrono::high_resolution_clock::now();
 #endif
