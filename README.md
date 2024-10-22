@@ -139,7 +139,7 @@ int main() {
 
     //create/update a new version of the edge of label 1 and data.
     txn.checked_put_edge(vid1,1,vid2,data.c_str());
-    txn.checked_put_edge(vid2,1,vid1,data.c_str());
+    //txn.checked_put_edge(vid2,1,vid1,data.c_str()); no need to insert the reverse edge, our undirected edge function will insert both directions. However, users can change graph_global.hpp to disable built-in undirected graph functions
     txn.commit();
 
     //create a read-only transaction
