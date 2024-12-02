@@ -516,7 +516,7 @@ RWTransaction::checked_put_edge(gt::vertex_t src, gt::label_t label, gt::vertex_
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
         txn->get_graph().local_thread_edge_write_time.local()+= duration.count();
 #endif
-        if(result == GTX::Txn_Operation_Response::SUCCESS_NEW_DELTA){
+        if(result == GTX::Txn_Operation_Response::SUCCESS_NEW_DELTA)[[likely]]{
 #if ENSURE_DURABILITY
             txn->record_wal(GTX::WALType::EDGE_UPDATE,src,edge_data,dst,label);
 #endif
@@ -554,7 +554,7 @@ RWTransaction::checked_put_edge(gt::vertex_t src, gt::label_t label, gt::vertex_
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
         txn->get_graph().local_thread_edge_write_time.local()+= duration.count();
 #endif
-        if(result ==  GTX::Txn_Operation_Response::SUCCESS_NEW_DELTA || result == GTX::Txn_Operation_Response::SUCCESS_EXISTING_DELTA){
+        if(result ==  GTX::Txn_Operation_Response::SUCCESS_NEW_DELTA || result == GTX::Txn_Operation_Response::SUCCESS_EXISTING_DELTA)[[likely]]{
 #if ENSURE_DURABILITY
             txn->record_wal(GTX::WALType::EDGE_UPDATE,dst,edge_data,src,label);
 #endif
