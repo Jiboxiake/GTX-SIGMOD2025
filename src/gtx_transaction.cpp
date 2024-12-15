@@ -1060,9 +1060,10 @@ void RWTransaction::checked_consolidation(GTX::BwLabelEntry *current_label_entry
     //analyze scan finished, now apply heuristics
     //use the block creation time vs. latest committed write to estimate lifespan
     //uint64_t lifespan = largest_creation_ts - current_block->get_consolidation_time(); /*current_label_entry->consolidation_time;*/ //approximate lifespan of the block
-    //todo:; apply different heuristics
+    //timestapmp-based heuristics to calculate the new block size
     /*size_t new_block_size = calculate_nw_block_size_from_lifespan(data_size,lifespan,20);
     auto new_order = size_to_order(new_block_size);*/
+    //simple heuristcis to calculate the new block size
     auto new_order = calculate_new_fit_order(data_size+sizeof(EdgeDeltaBlockHeader));
    /* if(static_cast<uint32_t>(current_block->get_order())>20){
       */

@@ -506,11 +506,46 @@ bool
 RWTransaction::checked_put_edge(gt::vertex_t src, gt::label_t label, gt::vertex_t dst, std::string_view edge_data) {
     bool return_result = true;
     bool continue_executing = true;
-    while(continue_executing){
+
 #if TRACK_EXECUTION_TIME
         auto start = std::chrono::high_resolution_clock::now();
 #endif
         auto result = txn->checked_put_edge(src,dst,label,edge_data);
+#if TRACK_EXECUTION_TIME
+        auto stop = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+        txn->get_graph().local_thread_edge_write_time.local()+= duration.count();
+#endif
+        if(result == GTX::Txn_Operation_Response::SUCCESS_NEW_DELTA){
+#if ENSURE_DURABILITY
+            txn->record_wal(GTX::WALType::EDGE_UPDATE,src,edge_data,dst,label);
+#endif
+            //return true;
+            //break;
+            continue_executing= false;
+        }else if(result == GTX::Txn_Operation_Response::SUCCESS_EXISTING_DELTA){
+#if ENSURE_DURABILITY
+            txn->record_wal(GTX::WALType::EDGE_UPDATE,src,edge_data,dst,label);
+#endif
+            //return false;
+            return_result = false;
+            continue_executing= false;
+        }
+        else if(result ==GTX::Txn_Operation_Response::FAIL){
+#if TRACK_COMMIT_ABORT
+            txn->get_graph().register_abort();
+#endif
+            throw RollbackExcept("write write conflict edge");
+        }
+#if TRACK_COMMIT_ABORT
+        txn->get_graph().register_loop();
+#endif
+
+    while(continue_executing){
+#if TRACK_EXECUTION_TIME
+        auto start = std::chrono::high_resolution_clock::now();
+#endif
+        result = txn->checked_put_edge(src,dst,label,edge_data);
 #if TRACK_EXECUTION_TIME
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
@@ -544,11 +579,35 @@ RWTransaction::checked_put_edge(gt::vertex_t src, gt::label_t label, gt::vertex_
 
 #if DIRECTED_GRAPH
     continue_executing= true;
+#if TRACK_EXECUTION_TIME
+        auto start = std::chrono::high_resolution_clock::now();
+#endif
+        result = txn->checked_put_edge(dst,src,label,edge_data);
+#if TRACK_EXECUTION_TIME
+        auto stop = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+        txn->get_graph().local_thread_edge_write_time.local()+= duration.count();
+#endif
+        if(result ==  GTX::Txn_Operation_Response::SUCCESS_NEW_DELTA || result == GTX::Txn_Operation_Response::SUCCESS_EXISTING_DELTA){
+#if ENSURE_DURABILITY
+            txn->record_wal(GTX::WALType::EDGE_UPDATE,dst,edge_data,src,label);
+#endif
+            return return_result;
+        }
+        else if (result == GTX::Txn_Operation_Response::FAIL){
+#if TRACK_COMMIT_ABORT
+            txn->get_graph().register_abort();
+#endif
+            throw RollbackExcept("write write conflict edge");
+        }
+#if TRACK_COMMIT_ABORT
+        txn->get_graph().register_loop();
+#endif
     while(continue_executing){
 #if TRACK_EXECUTION_TIME
         auto start = std::chrono::high_resolution_clock::now();
 #endif
-        auto result = txn->checked_put_edge(dst,src,label,edge_data);
+        result = txn->checked_put_edge(dst,src,label,edge_data);
 #if TRACK_EXECUTION_TIME
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);

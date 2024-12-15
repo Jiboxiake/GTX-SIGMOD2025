@@ -690,7 +690,11 @@ namespace GTX{
          * otherwise we return size_to_order directly
          */
         inline order_t calculate_new_fit_order(uint64_t block_storage_size){
+            #if USING_BIGDATA
+            order_t new_order = size_to_order(block_storage_size)*1.25;
+            #else
             order_t new_order = size_to_order(block_storage_size);
+            #endif
             uint64_t new_size = 1ul<<new_order;
             //if the next order is less than 25% larger than the current size, double the new size
             if(new_size-block_storage_size<block_storage_size/4){
