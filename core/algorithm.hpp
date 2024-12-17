@@ -605,16 +605,20 @@ namespace GTX{
 
     class SSSP{
     public:
-        SSSP(BwGraph* input_graph, uint64_t max_vid):graph(input_graph),max_vid(max_vid),dist(max_vid, std::numeric_limits<double>::infinity()){
-            result.resize(max_vid);
+        SSSP(BwGraph* input_graph/*, uint64_t max_vid*/):graph(input_graph)/*,max_vid(max_vid),dist(max_vid, std::numeric_limits<double>::infinity())*/{
+            //result.resize(max_vid);
             txn_tables = &graph->get_txn_tables();
         }
         inline void reset(){
-            std::fill(dist.begin(), dist.end(), std::numeric_limits<double>::infinity());
+            //std::fill(dist.begin(), dist.end(), std::numeric_limits<double>::infinity());
         }
         void compute(uint64_t source, double delta){
             //std::cout<<"entering compute algorithm"<<std::endl;
             auto txn = graph->begin_shared_ro_transaction();
+            auto max_vid = graph->get_max_allocated_vid();
+            gapbs::pvector<double> dist(max_vid, std::numeric_limits<double>::infinity());
+            //dist.resize(max_vid,std::numeric_limits<double>::infinity());
+            result.resize(max_vid);
             auto read_ts =txn.get_read_ts();
             //std::cout<<"using dynamic sssp"<<std::endl;
             /*if(graph->get_max_allocated_vid()!=max_vid)[[unlikely]]{
@@ -846,7 +850,7 @@ namespace GTX{
     private:
         BwGraph* graph;
         uint64_t max_vid;
-        gapbs::pvector<double> dist; //cost to reach each vertex
+        //gapbs::pvector<double> dist; //cost to reach each vertex
         std::vector<std::pair<uint64_t, double>>result;//final result
         size_t kMaxBin = std::numeric_limits<size_t>::max()/2;
         TxnTables * txn_tables;

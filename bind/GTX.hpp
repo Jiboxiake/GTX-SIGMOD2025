@@ -92,7 +92,7 @@ namespace gt {
         //algorithm implementation
         PageRankHandler get_pagerank_handler(uint64_t num);
         BFSHandler get_bfs_handler(uint64_t num);
-        SSSPHandler get_sssp_handler(uint64_t num);
+        SSSPHandler get_sssp_handler(/*uint64_t num*/);
         OneHopNeighborsHandler get_one_hop_neighbors_handler();
         TwoHopNeighborsHandler get_two_hop_neighbors_handler();
         void recovery_from_checkpoint();

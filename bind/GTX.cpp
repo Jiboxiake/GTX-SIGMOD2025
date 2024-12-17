@@ -184,8 +184,8 @@ BFSHandler Graph::get_bfs_handler(uint64_t num) {
     return {std::make_unique<impl::BFS>(graph.get(),num)};
 }
 
-SSSPHandler Graph::get_sssp_handler(uint64_t num) {
-    return {std::make_unique<GTX::SSSP>(graph.get(),num)};
+SSSPHandler Graph::get_sssp_handler(/*uint64_t num*/) {
+    return {std::make_unique<GTX::SSSP>(graph.get()/*,num*/)};
 }
 
 TwoHopNeighborsHandler Graph::get_two_hop_neighbors_handler() {
@@ -216,7 +216,7 @@ std::vector<std::pair<uint64_t, double>>* Graph::compute_sssp(uint64_t max_vid, 
     if(sssp)[[likely]]{
         sssp->reset();
     }else[[unlikely]]{
-        sssp = new impl::SSSP(this->graph.get(),max_vid);
+        sssp = new impl::SSSP(this->graph.get()/*,max_vid*/);
     }
     sssp->compute(source,delta);
     return sssp->get_result();
