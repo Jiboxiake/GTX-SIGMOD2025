@@ -691,7 +691,8 @@ namespace GTX{
          */
         inline order_t calculate_new_fit_order(uint64_t block_storage_size){
             #if USING_BIGDATA
-            order_t new_order = size_to_order(block_storage_size)*1.25;
+            order_t new_order = size_to_order(block_storage_size);
+            new_order += std::round(((double)new_order)/8);
             #else
             order_t new_order = size_to_order(block_storage_size);
             #endif
