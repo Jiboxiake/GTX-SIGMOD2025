@@ -185,7 +185,7 @@ int main() {
 }
 ```
 ## Evaluation Experiment
-GTX has been evaluated against state-of-the-art transactional graphy systems using [GFE_Driver](https://anonymous.4open.science/r/gfe_driver_sigmod2025-1387/README.md). Please follow its README to repeat and reproduce the experiments in our paper.
+GTX has been evaluated against state-of-the-art transactional graph systems using [GFE_Driver](https://anonymous.4open.science/r/gfe_driver_sigmod2025-1387/README.md). Please follow its README to repeat and reproduce the experiments in our paper.
 
 ## Serializable GTX
 We also designed and implemented [GTX](https://anonymous.4open.science/r/GTX-Serializable-FE12/README.md) with serializable transactions using read set validation.
