@@ -5,6 +5,7 @@
 #include "core/block_manager.hpp"
 #include "core/utils.hpp"
 #include "core/block.hpp"
+#include "core/bwgraph.hpp"
 namespace GTX{
     void EdgeLabelBlock::deallocate_all_delta_chains_indices() {
         uint8_t current_offset = offset.load(std::memory_order_acquire);
@@ -159,6 +160,28 @@ namespace GTX{
         current_label_block->label_entries[current_offset].valid.store(true,std::memory_order_release);
         return &current_label_block->label_entries[current_offset];
     }
+
+#if USING_VINDEX_POINTER
+
+    void VertexIndex::resize_array() {
+        timestamp_t current_ts =graph->get_block_access_ts_table().calculate_safe_ts();;
+        if(last_ptr!= nullptr){
+            while(current_ts<=safe_ts){
+                current_ts = graph->get_block_access_ts_table().calculate_safe_ts();
+            }
+            delete last_ptr;
+        }
+        last_ptr = bucket_index_ptr.load();
+        safe_ts = current_ts;
+        auto new_num = BUCKET_NUM*2;
+        std::vector<BucketPointer>* new_array = new std::vector<BucketPointer>(new_num);
+        for(size_t i=0; i<last_ptr->size();i++){
+            new_array->at(i)=last_ptr->at(i);
+        }
+        bucket_index_ptr.store(new_array);
+        BUCKET_NUM.store(new_num);
+    }
+#endif
 }
 
 

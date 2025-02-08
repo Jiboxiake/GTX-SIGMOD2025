@@ -184,7 +184,7 @@ int main() {
     return 0;
 }
 ```
-## Evaluation Experiment
+## Evaluation Experiments
 GTX has been evaluated against state-of-the-art transactional graph systems using [GFE_Driver](https://anonymous.4open.science/r/gfe_driver_sigmod2025-1387/README.md). Please follow its README to repeat and reproduce the experiments in our paper.
 
 ## Serializable GTX

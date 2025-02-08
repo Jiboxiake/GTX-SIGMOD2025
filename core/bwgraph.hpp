@@ -113,7 +113,7 @@ namespace GTX{
     public:
 #if USING_ARRAY_TABLE
         BwGraph(std::string block_path = "",size_t _max_block_size = 1ul << 32,
-            std::string wal_path = ""): block_manager(block_path,_max_block_size), vertex_index(block_manager),txn_tables(this),garbage_queues(worker_thread_num, GarbageBlockQueue(&block_manager))
+            std::string wal_path = ""): block_manager(block_path,_max_block_size), vertex_index(this,block_manager),txn_tables(this),garbage_queues(worker_thread_num, GarbageBlockQueue(&block_manager))
 #if ENSURE_DURABILITY
                 , checkpoint(this)
 #endif

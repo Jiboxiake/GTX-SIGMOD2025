@@ -9,7 +9,7 @@
 #define WORKER_THREAD_NUM 32
 #endif*/
 
-constexpr uint32_t worker_thread_num = 72;
+constexpr uint32_t worker_thread_num = 64;
 //transaction states
 #define ABORT 0x7FFFFFFFFFFFFFFF
 #define IN_PROGRESS 0
@@ -27,7 +27,7 @@ constexpr uint64_t garbage_collection_size_threshold = 1ul<<20;
 //block allocation
 #define DEFAULT_EDGE_DELTA_BLOCK_ORDER 9
 #define BUCKET_SIZE 33554432//536870912/16 //for test use smaller bucket size
-#define BUCKET_NUM 8
+#define DEFAULT_BUCKET_NUM 8
 #define BAD_BLOCK_ID 0
 #define USING_PESSIMISTIC_MODE true
 constexpr uint64_t placeholder_txn_id = 0x80FFFFFFFFFFFFFF;//all commit ts is greater than 0, and initial
@@ -58,5 +58,6 @@ constexpr uint8_t index_lookup_order_threshold = 12;
 #define ENSURE_DURABILITY false
 #define DIRECTED_GRAPH true
 #define USING_BIGDATA false
+#define USING_VINDEX_POINTER true
 constexpr uint32_t prefetch_offset = 512;
 //#endif //BWGRAPH_V2_GRAPH_GLOBAL_HPP
