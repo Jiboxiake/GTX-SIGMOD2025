@@ -20,7 +20,7 @@ This is GTX, a main memory graph system that manages and queries dynamic graphs.
 - include library GTX in your project's CMakeLists.txt. 
 - copy bind/GTX.hpp into your project. 
 - include GTX.hpp to use GTX
-- optional: install and run [GTX Checkpoint Manager](https://anonymous.4open.science/r/GTX_Checkpoint_Merger-608E/README.md) to merge fuzzy incremental checkpoints and truncate logs.
+- optional: install and run [GTX Checkpoint Manager](https://github.com/Jiboxiake/GTX_Checkpoint_Merger) to merge fuzzy incremental checkpoints and truncate logs.
 ### API
 The full GTX APIs can be found in /bind/GTX.hpp.
 Here we list the core APIs to manage and query a dynamic graph using GTX
@@ -185,7 +185,7 @@ int main() {
 }
 ```
 ## Evaluation Experiments
-GTX has been evaluated against state-of-the-art transactional graph systems using [GFE_Driver](https://anonymous.4open.science/r/gfe_driver_sigmod2025-1387/README.md). Please follow its README to repeat and reproduce the experiments in our paper.
+GTX has been evaluated against state-of-the-art transactional graph systems using [GFE_Driver](https://github.com/Jiboxiake/gfe_driver_sigmod2025). Please follow its README to repeat and reproduce the experiments in our paper.
 
 ## Serializable GTX
-We also designed and implemented [GTX](https://anonymous.4open.science/r/GTX-Serializable-FE12/README.md) with serializable transactions using read set validation.
+We also designed and implemented [GTX](https://github.com/Jiboxiake/GTX-Serializable) with serializable transactions using read set validation.
