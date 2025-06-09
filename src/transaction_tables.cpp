@@ -122,7 +122,7 @@ namespace GTX{
         }
         return found;
     }
-    void ArrayTransactionTable::eager_clean(uint64_t index) {
+    bool ArrayTransactionTable::eager_clean(uint64_t index) {
         //need to access BwGraph and its block manager
         auto& entry = local_table[index];
 #if USING_EAGER_CLEAN
@@ -317,6 +317,13 @@ namespace GTX{
         size_t count =0;
         while(entry.op_count.load(std::memory_order_acquire)){
             if(count++==10000000000){
+                /*std::cout<<"index is "<<index<<std::endl;
+                std::cout<<"txn id is "<<entry.txn_id<<std::endl;
+                std::cout<<"status is "<<entry.status<<" op count is "<<entry.op_count.load()<<std::endl;
+                count=0;*/
+                return false;
+            }
+            if(false){
                 std::cout<<"index is "<<index<<std::endl;
                 std::cout<<"txn id is "<<entry.txn_id<<std::endl;
                 //std::cout<<"touched block size is "<<entry.touched_blocks.size()<<std::endl;
@@ -399,6 +406,7 @@ namespace GTX{
                 throw EagerCleanException();
             }
         }
+        return true;
         //std::cout<<"eager clean succeeds"<<std::endl;
     }
 

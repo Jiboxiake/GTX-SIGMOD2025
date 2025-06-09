@@ -842,10 +842,16 @@ namespace GTX {
                     }
                 } else {
                     //todo: abort should happen after the restore? so txn will never observe unlocked offset to abort deltas
-                    std::cout << "eager abort 1" << std::endl;
-                    throw EagerAbortException();
+                    //std::cout << "eager abort 1" << std::endl;
+                    std::cout<<current_head_delta->creation_ts.load(std::memory_order_acquire)<<std::endl;
+                    std::cout<<current_head_delta->previous_offset<<std::endl;
+                    std::cout<<current_head_delta->toID<<std::endl;
+                    std::cout<<current_head_ts<<std::endl;
+                    std::cout<<latest_delta_chain_head_offset<<std::endl;
+
+                    //throw EagerAbortException();
                     //delta chain head failed during validation, so we need to retry
-                    //return Delta_Chain_Lock_Response::UNCLEAR;
+                    return Delta_Chain_Lock_Response::UNCLEAR;
                 }
             } else {
                 if (target_chain_index_entry.try_set_lock(latest_delta_chain_head_offset)) {
@@ -929,10 +935,18 @@ namespace GTX {
                     }
                 } else {
                     //todo: abort should happen after the restore? so txn will never observe unlocked offset to abort deltas
-                    std::cout << "eager abort 1" << std::endl;
-                    throw EagerAbortException();
+                    //std::cout << "eager abort 1" << std::endl;
+                    /*
+                    std::cout<<current_head_delta->creation_ts.load(std::memory_order_acquire)<<std::endl;
+                    std::cout<<current_head_delta->previous_offset<<std::endl;
+                    std::cout<<current_head_delta->toID<<std::endl;
+                    std::cout<<current_head_ts<<std::endl;
+                    std::cout<<latest_delta_chain_head_offset<<std::endl;
+                    //std::cout<<latest_delta_chain_head_offset<<std::endl;
+                    throw EagerAbortException();*/
                     //delta chain head failed during validation, so we need to retry
                     //return Delta_Chain_Lock_Response::UNCLEAR;
+                    return Delta_Chain_Lock_Response::CONFLICT;
                 }
             } else {
                 if (target_chain_index_entry.try_set_lock(latest_delta_chain_head_offset)) {

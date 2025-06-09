@@ -12,7 +12,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "-ltbb -std=c++20 -g -fno-omit-frame-pointer -fopenmp 
 #set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ltbb -std=c++17  -g  -Wall -Wextra -Wshadow -Wnon-virtual-dtor -pedantic")
 #set(CMAKE_CXX_FLAGS_RELEASE "-ltbb -std=c++17 -g -fno-omit-frame-pointer -Wall -Wextra -Wnon-virtual-dtor -pedantic -Wconversion -Wlogical-op -O3 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE "-ltbb -std=c++20 -g -fno-omit-frame-pointer -fopenmp -Wall -Wextra -Wnon-virtual-dtor -pedantic -Wconversion -Wlogical-op -O3 -DNDEBUG")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g -ltbb -std=c++20 -fno-omit-frame-pointer -fopenmp -Wall -Wextra -Wnon-virtual-dtor -pedantic -Wconversion -Wlogical-op")
 #set (CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-as-needed -lprofiler -Wl,--as-needed")
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING

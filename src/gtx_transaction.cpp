@@ -264,6 +264,7 @@ Txn_Operation_Response RWTransaction::checked_put_edge(GTX::vertex_t src, GTX::v
             }
         }
     }else{
+        //BlockStateVersionProtectionScheme::release_protection(thread_id,block_access_ts_table);
 #if ENABLE_VERTEX_DELETION
         auto current_state = target_label_entry->state.load(std::memory_order_acquire);
         if(current_state==EdgeDeltaBlockState::DELETION)[[unlikely]]{
@@ -1845,6 +1846,8 @@ bool RWTransaction::simple_validation() {
                 op_count -= validated_offsets_cache->second.eager_abort(current_block,current_label_entry,local_txn_id,0);//must use cache
                 per_block_cached_delta_chain_offsets.erase(validated_offsets_cache);
                 reverse_it++;
+                //added June 9th 2025
+                BlockStateVersionProtectionScheme::release_protection(thread_id,block_access_ts_table);
             }else if(validation_state== EdgeDeltaBlockState::INSTALLATION
                      #if ENABLE_VERTEX_DELETION
                         ||validation_state==EdgeDeltaBlockState::DELETION

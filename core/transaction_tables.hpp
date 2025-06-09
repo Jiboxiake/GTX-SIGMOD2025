@@ -387,7 +387,7 @@ namespace GTX {
         void resize(uint64_t entry_num){
             local_table.resize(entry_num);
         }
-        void eager_clean(uint64_t index);
+        bool eager_clean(uint64_t index);
         void eager_clean(uint64_t index, std::unordered_set<uint64_t>& cleaned_blocks);
         void range_eager_clean(uint64_t index);
         inline void set_thread_id(uint8_t id){thread_id=id;}
@@ -399,8 +399,15 @@ namespace GTX {
                 throw std::runtime_error("error, the txn did not get a final state");
             }
 #endif
+            //retry:
             if(local_table[index].op_count.load(std::memory_order_acquire)){
-                eager_clean(index);
+                //throw std::runtime_error("for debugging the eager clean");
+                if(!eager_clean(index)){
+                    offset++;
+                    index = offset%per_thread_table_size;
+                    //goto retry;
+                }
+                //std::cout<<"eager cleaned for offset "<<offset<<std::endl;
             }
             uint64_t new_txn_id = GTX::generate_txnID(thread_id,offset);
             offset++;
