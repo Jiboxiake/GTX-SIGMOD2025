@@ -399,13 +399,13 @@ namespace GTX {
                 throw std::runtime_error("error, the txn did not get a final state");
             }
 #endif
-            //retry:
+            retry:
             if(local_table[index].op_count.load(std::memory_order_acquire)){
                 //throw std::runtime_error("for debugging the eager clean");
                 if(!eager_clean(index)){
                     offset++;
                     index = offset%per_thread_table_size;
-                    //goto retry;
+                    goto retry;
                 }
                 //std::cout<<"eager cleaned for offset "<<offset<<std::endl;
             }
